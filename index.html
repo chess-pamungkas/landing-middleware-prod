@@ -1,0 +1,3683 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta
+      name="description"
+      content="Implementation guide for OQtima registration script (internal use only)"
+    />
+    <title>OQtima Registration Script - Implementation Guide</title>
+
+    <!-- Include the OQtima registration script with API key for authentication -->
+    <script
+      src="http://localhost:8000/scripts/registration-popup-script.min.js"
+      data-api-key="oqtima_dev_reg_iframe_7d19e2c53a84"
+    ></script>
+
+    <style>
+      /* Global styles */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        line-height: 1.5;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+
+      /* Container styles */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      /* Header styles */
+      .header {
+        background-color: #f5f5f5;
+        padding: 30px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        text-align: center;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      h2 {
+        color: #ff4400;
+        margin-top: 40px;
+        margin-bottom: 15px;
+      }
+
+      /* Implementation section */
+      .implementation {
+        background-color: white;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Step styles */
+      .step {
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        background-color: #fdfdfd;
+      }
+
+      /* Code example styles */
+      .code-example {
+        background-color: #f5f5f5;
+        border-left: 4px solid #ff4400;
+        padding: 15px;
+        font-family: monospace;
+        margin: 15px 0;
+        white-space: pre-wrap;
+        overflow-x: auto;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #333;
+        display: block;
+      }
+
+      /* Notes and warnings */
+      .note {
+        background-color: #e8f4fd;
+        border-left: 4px solid #0078d4;
+        padding: 15px;
+        margin: 15px 0;
+      }
+
+      .warning-note {
+        background-color: #fff5f5;
+        border-left: 4px solid #ff4400;
+        padding: 15px;
+        margin: 15px 0;
+      }
+
+      .security-note {
+        background-color: #e8f7ff;
+        border-left: 4px solid #0070d2;
+        padding: 15px;
+        margin: 15px 0;
+      }
+
+      /* Tab styles */
+      .tab-container {
+        margin: 20px 0;
+      }
+
+      .tab-nav {
+        display: flex;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .tab-button {
+        padding: 10px 20px;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-bottom: none;
+        border-radius: 4px 4px 0 0;
+        margin-right: 5px;
+        cursor: pointer;
+        position: relative;
+        top: 1px;
+      }
+
+      .tab-button.active {
+        background-color: white;
+        border-bottom: 1px solid white;
+        color: #ff4400;
+        font-weight: bold;
+      }
+
+      .tab-content {
+        display: none;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      /* Subtab specific styles */
+      .comprehensive-examples .tab-button {
+        font-size: 0.9em;
+        padding: 8px 15px;
+        background-color: #f9f9f9;
+      }
+
+      .comprehensive-examples .tab-content {
+        background-color: #fafafa;
+        border: 1px solid #eee;
+      }
+
+      .comprehensive-examples .tab-nav {
+        margin-bottom: 0;
+      }
+
+      /* Language section styles */
+      .language-examples {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .language-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .language-header {
+        padding: 10px 15px;
+        background-color: #f5f5f5;
+        border-bottom: 1px solid #ddd;
+        font-weight: bold;
+      }
+
+      .language-content {
+        padding: 15px;
+      }
+
+      .rtl-example {
+        direction: rtl;
+        text-align: right;
+      }
+
+      button[data-oqtima-trigger] {
+        background-color: #ff4400;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        margin: 10px 0;
+        display: inline-block;
+      }
+
+      a[data-oqtima-trigger] {
+        color: #0078d4;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      /* Example preview section */
+      .example-preview {
+        margin-top: 20px;
+        padding: 20px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        background-color: #fdfdfd;
+      }
+
+      /* Added styles for better mobile view */
+      @media (max-width: 768px) {
+        .language-examples {
+          grid-template-columns: 1fr;
+        }
+
+        .tab-nav {
+          flex-wrap: wrap;
+        }
+
+        .tab-button {
+          margin-bottom: 5px;
+        }
+      }
+
+      /* Additional styles for the comprehensive examples */
+      .comprehensive-examples {
+        margin-top: 30px;
+      }
+
+      .example-language-section {
+        margin-bottom: 40px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .example-language-header {
+        background-color: #f5f5f5;
+        padding: 15px;
+        font-weight: bold;
+        border-bottom: 1px solid #eee;
+      }
+
+      .example-language-content {
+        padding: 20px;
+      }
+
+      .example-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .example-item {
+        border: 1px solid #eee;
+        border-radius: 6px;
+        padding: 15px;
+        background-color: #fdfdfd;
+      }
+
+      .example-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .example-code {
+        background-color: #f5f5f5;
+        border-left: 3px solid #ff4400;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 12px;
+        margin: 10px 0;
+        white-space: pre-wrap;
+        overflow-x: auto;
+      }
+
+      .example-preview {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px dashed #ddd;
+      }
+
+      /* Button style variations */
+      .btn-primary {
+        background-color: #0078d4;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .btn-secondary {
+        background-color: white;
+        color: #333;
+        border: 2px solid #0078d4;
+        padding: 8px 18px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .btn-rounded {
+        background-color: #ff4400;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .btn-flat {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-weight: bold;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Link style variations */
+      .link-underline {
+        color: #0078d4;
+        text-decoration: underline;
+        cursor: pointer;
+        font-weight: normal;
+      }
+
+      .link-button {
+        display: inline-block;
+        color: #0078d4;
+        text-decoration: none;
+        border: 1px solid #0078d4;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .link-arrow::after {
+        content: " →";
+      }
+
+      .link-bold {
+        color: #0078d4;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      /* Image variations */
+      .img-rounded {
+        border-radius: 8px;
+        cursor: pointer;
+        max-width: 100%;
+        height: auto;
+      }
+
+      .img-border {
+        border: 2px solid #ddd;
+        padding: 3px;
+        cursor: pointer;
+        max-width: 100%;
+        height: auto;
+      }
+
+      .img-shadow {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* RTL support for examples */
+      .rtl-content {
+        direction: rtl;
+        text-align: right;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>OQtima Registration Script</h1>
+        <p>Implementation guide for OQtima popup registration script</p>
+
+        <div class="warning-note">
+          FOR OQTIMA INTERNAL USE ONLY - This script and implementation guide is
+          restricted to authorized OQtima personnel only
+        </div>
+      </div>
+
+      <div class="implementation">
+        <h2>Implementation Guide</h2>
+        <p>
+          Follow these steps to integrate the OQtima registration popup script
+          on your landing page. This new implementation provides more
+          flexibility by allowing you to use any HTML element as a trigger for
+          the registration popup.
+        </p>
+
+        <div class="step">
+          <h3>Step 1: Add the Script to Your Page</h3>
+          <p>
+            Add the script tag to the <code>&lt;head&gt;</code> section of your
+            HTML. This allows the script to load early and be available
+            throughout your page:
+          </p>
+          <div class="code-example">
+            &lt;script
+            src="https://oqtima.com/scripts/registration-popup-script.min.js"
+            data-api-key="your_api_key_here" &gt;&lt;/script&gt;
+          </div>
+
+          <div class="note">
+            <strong>Important:</strong> The <code>data-api-key</code> attribute
+            is required for authentication. You must use the API key provided by
+            OQtima. Contact your account manager if you don't have an API key.
+          </div>
+        </div>
+
+        <div class="step">
+          <h3>Step 2: Add Trigger Elements</h3>
+          <p>
+            Add the <code>data-oqtima-trigger</code> attribute to any HTML
+            element you want to use as a trigger for the registration popup.
+            This can be a button, link, image, or any other clickable element:
+          </p>
+
+          <div class="code-example">
+            &lt;!-- Button trigger example --&gt; &lt;button data-oqtima-trigger
+            data-referral-type="12" data-referral-value="IB08801328J"
+            data-lang="en" &gt; Register Now &lt;/button&gt; &lt;!-- Link
+            trigger example --&gt; &lt;a href="#" data-oqtima-trigger
+            data-referral-type="12" data-referral-value="IB08801328J"
+            data-lang="en" &gt; Open Registration Form &lt;/a&gt; &lt;!-- Image
+            trigger example --&gt; &lt;img src="path-to-your-banner.jpg"
+            alt="Registration Banner" data-oqtima-trigger
+            data-referral-type="12" data-referral-value="IB08801328J"
+            data-lang="en" /&gt;
+          </div>
+
+          <div class="example-preview">
+            <h4>Live Examples:</h4>
+
+            <button
+              data-oqtima-trigger
+              data-referral-type="12"
+              data-referral-value="IB08801328J"
+              data-lang="en"
+              style="
+                background-color: #ff4400;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+              "
+            >
+              Register Now
+            </button>
+
+            <div style="margin-top: 10px">
+              <a
+                href="#"
+                data-oqtima-trigger
+                data-referral-type="12"
+                data-referral-value="IB08801328J"
+                data-lang="en"
+              >
+                Open Registration Form
+              </a>
+            </div>
+          </div>
+
+          <div class="note">
+            <strong>Supported parameters:</strong>
+            <ul>
+              <li>
+                <code>data-oqtima-trigger</code>: Required attribute that marks
+                the element as a trigger for the registration popup
+              </li>
+              <li>
+                <code>data-referral-type</code>: Referral type for tracking
+                (optional)
+                <ul>
+                  <li><strong>12</strong> - IB Referral Link</li>
+                  <li><strong>14</strong> - Campaign Link</li>
+                </ul>
+              </li>
+              <li>
+                <code>data-referral-value</code>: Referral value for tracking
+                (optional)
+              </li>
+              <li>
+                <code>data-lang</code>: Language code (en, fr, br, vn, th, es,
+                it, cn, zh, id, jp, my, ar) (optional, default: "en")
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <h2>Implementation Examples</h2>
+        <p>
+          Below are examples for different implementation scenarios. Use the
+          main tabs to switch between registration types, and the subtabs to
+          explore different trigger types (buttons, links, images).
+        </p>
+
+        <div class="tab-container">
+          <div class="tab-nav">
+            <div
+              class="tab-button active"
+              onclick="openTab(event, 'normal-registration')"
+            >
+              Normal Registration
+            </div>
+            <div class="tab-button" onclick="openTab(event, 'ib-referral')">
+              IB Referral Link
+            </div>
+            <div class="tab-button" onclick="openTab(event, 'campaign-link')">
+              Campaign Link
+            </div>
+          </div>
+
+          <!-- Normal Registration Tab -->
+          <div id="normal-registration" class="tab-content active">
+            <h3>Normal Registration</h3>
+            <p>
+              Use this implementation when no specific referral tracking is
+              needed:
+            </p>
+
+            <div class="code-example">
+              &lt;button data-oqtima-trigger data-lang="en" &gt; Register Now
+              &lt;/button&gt;
+            </div>
+
+            <!-- Inner Tab Navigation -->
+            <div
+              class="tab-container comprehensive-examples"
+              style="margin-top: 25px"
+            >
+              <div class="tab-nav">
+                <div
+                  class="tab-button active"
+                  onclick="openSubTab(event, 'normal-button-examples')"
+                >
+                  Button Examples
+                </div>
+                <div
+                  class="tab-button"
+                  onclick="openSubTab(event, 'normal-link-examples')"
+                >
+                  Link Examples
+                </div>
+              </div>
+
+              <!-- Button Examples Subtab -->
+              <div id="normal-button-examples" class="tab-content active">
+                <h4>Button Trigger Examples</h4>
+                <p>
+                  Buttons are the most common trigger elements. Below are
+                  examples of different button styles for various languages:
+                </p>
+
+                <div class="language-examples">
+                  <!-- English -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      English (en) - Default Style
+                    </div>
+                    <div class="language-content">
+                      <div class="code-example">
+                        &lt;button data-oqtima-trigger
+                        data-lang="en"&gt;Register Now&lt;/button&gt;
+                      </div>
+                      <button data-oqtima-trigger data-lang="en">
+                        Register Now
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- French -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      French (fr) - Rounded Style
+                    </div>
+                    <div class="language-content">
+                      <div class="code-example">
+                        &lt;button data-oqtima-trigger data-lang="fr"
+                        class="btn-rounded" style="background-color: #3498db;
+                        border-radius: 30px;" &gt;S'inscrire
+                        maintenant&lt;/button&gt;
+                      </div>
+                      <button
+                        data-oqtima-trigger
+                        data-lang="fr"
+                        style="background-color: #3498db; border-radius: 30px"
+                      >
+                        S'inscrire maintenant
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Spanish -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Spanish (es) - Outline Style
+                    </div>
+                    <div class="language-content">
+                      <div class="code-example">
+                        &lt;button data-oqtima-trigger data-lang="es"
+                        style="background-color: transparent; color: #e74c3c;
+                        border: 2px solid #e74c3c; font-weight: bold;"
+                        &gt;Regístrate ahora&lt;/button&gt;
+                      </div>
+                      <button
+                        data-oqtima-trigger
+                        data-lang="es"
+                        style="
+                          background-color: transparent;
+                          color: #e74c3c;
+                          border: 2px solid #e74c3c;
+                          font-weight: bold;
+                        "
+                      >
+                        Regístrate ahora
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Italian -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Italian (it) - Gradient Style
+                    </div>
+                    <div class="language-content">
+                      <div class="code-example">
+                        &lt;button data-oqtima-trigger data-lang="it"
+                        style="background-image: linear-gradient(to right,
+                        #16a085, #27ae60); border: none; color: white;"
+                        &gt;Registrati ora&lt;/button&gt;
+                      </div>
+                      <button
+                        data-oqtima-trigger
+                        data-lang="it"
+                        style="
+                          background-image: linear-gradient(
+                            to right,
+                            #16a085,
+                            #27ae60
+                          );
+                          border: none;
+                          color: white;
+                        "
+                      >
+                        Registrati ora
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Portuguese -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Brazilian Portuguese (br) - Shadow Style
+                    </div>
+                    <div class="language-content">
+                      <div class="code-example">
+                        &lt;button data-oqtima-trigger data-lang="br"
+                        style="background-color: #9b59b6; color: white;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.3); border: none;"
+                        &gt;Registre-se agora&lt;/button&gt;
+                      </div>
+                      <button
+                        data-oqtima-trigger
+                        data-lang="br"
+                        style="
+                          background-color: #9b59b6;
+                          color: white;
+                          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                          border: none;
+                        "
+                      >
+                        Registre-se agora
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Vietnamese -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Vietnamese (vn) - Flat Style
+                    </div>
+                    <div class="language-content">
+                      <div class="code-example">
+                        &lt;button data-oqtima-trigger data-lang="vn"
+                        style="background-color: #2c3e50; color: white; border:
+                        none; text-transform: uppercase; letter-spacing: 1px;"
+                        &gt;Đăng ký ngay&lt;/button&gt;
+                      </div>
+                      <button
+                        data-oqtima-trigger
+                        data-lang="vn"
+                        style="
+                          background-color: #2c3e50;
+                          color: white;
+                          border: none;
+                          text-transform: uppercase;
+                          letter-spacing: 1px;
+                        "
+                      >
+                        Đăng ký ngay
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Thai -->
+                  <div class="language-card">
+                    <div class="language-header">Thai (th) - 3D Style</div>
+                    <div class="language-content">
+                      <div class="code-example">
+                        &lt;button data-oqtima-trigger data-lang="th"
+                        style="background-color: #f39c12; color: white; border:
+                        none; box-shadow: 0 5px 0 #d35400; position: relative;
+                        top: 0; transition: all 0.1s;"
+                        onmousedown="this.style.top='5px';
+                        this.style.boxShadow='none';"
+                        onmouseup="this.style.top='0'; this.style.boxShadow='0
+                        5px 0 #d35400';" &gt;ลงทะเบียนตอนนี้&lt;/button&gt;
+                      </div>
+                      <button
+                        data-oqtima-trigger
+                        data-lang="th"
+                        style="
+                          background-color: #f39c12;
+                          color: white;
+                          border: none;
+                          box-shadow: 0 5px 0 #d35400;
+                          position: relative;
+                          top: 0;
+                          transition: all 0.1s;
+                        "
+                        onmousedown="this.style.top='5px'; this.style.boxShadow='none';"
+                        onmouseup="this.style.top='0'; this.style.boxShadow='0 5px 0 #d35400';"
+                      >
+                        ลงทะเบียนตอนนี้
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Chinese Simplified -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Chinese Simplified (cn) - Icon Style
+                    </div>
+                    <div class="language-content">
+                      <div class="code-example">
+                        &lt;button data-oqtima-trigger data-lang="cn"
+                        style="background-color: #c0392b; color: white; border:
+                        none; position: relative; padding-left: 35px;"
+                        &gt;&lt;span style="position: absolute; left: 10px; top:
+                        50%; transform: translateY(-50%);"&gt;➜&lt;/span&gt;
+                        立即注册&lt;/button&gt;
+                      </div>
+                      <button
+                        data-oqtima-trigger
+                        data-lang="cn"
+                        style="
+                          background-color: #c0392b;
+                          color: white;
+                          border: none;
+                          position: relative;
+                          padding-left: 35px;
+                        "
+                      >
+                        <span
+                          style="
+                            position: absolute;
+                            left: 10px;
+                            top: 50%;
+                            transform: translateY(-50%);
+                          "
+                          >➜</span
+                        >
+                        立即注册
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Chinese Traditional -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Chinese Traditional (zh) - Pill Style
+                    </div>
+                    <div class="language-content">
+                      <div class="code-example">
+                        &lt;button data-oqtima-trigger data-lang="zh"
+                        style="background-color: #2980b9; color: white; border:
+                        none; border-radius: 50px; padding: 10px 30px;"
+                        &gt;立即註冊&lt;/button&gt;
+                      </div>
+                      <button
+                        data-oqtima-trigger
+                        data-lang="zh"
+                        style="
+                          background-color: #2980b9;
+                          color: white;
+                          border: none;
+                          border-radius: 50px;
+                          padding: 10px 30px;
+                        "
+                      >
+                        立即註冊
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Indonesian -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Indonesian (id) - Animated Style
+                    </div>
+                    <div class="language-content">
+                      <div class="code-example">
+                        &lt;button data-oqtima-trigger data-lang="id"
+                        style="background-color: #8e44ad; color: white; border:
+                        none; position: relative; overflow: hidden;"
+                        onmouseover="this.style.backgroundColor='#9b59b6'"
+                        onmouseout="this.style.backgroundColor='#8e44ad'"
+                        &gt;Daftar Sekarang&lt;/button&gt;
+                      </div>
+                      <button
+                        data-oqtima-trigger
+                        data-lang="id"
+                        style="
+                          background-color: #8e44ad;
+                          color: white;
+                          border: none;
+                          position: relative;
+                          overflow: hidden;
+                        "
+                        onmouseover="this.style.backgroundColor='#9b59b6'"
+                        onmouseout="this.style.backgroundColor='#8e44ad'"
+                      >
+                        Daftar Sekarang
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Japanese -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Japanese (jp) - Bordered Style
+                    </div>
+                    <div class="language-content">
+                      <div class="code-example">
+                        &lt;button data-oqtima-trigger data-lang="jp"
+                        style="background-color: white; color: #16a085; border:
+                        2px solid #16a085; position: relative; font-weight:
+                        bold;" &gt;今すぐ登録&lt;/button&gt;
+                      </div>
+                      <button
+                        data-oqtima-trigger
+                        data-lang="jp"
+                        style="
+                          background-color: white;
+                          color: #16a085;
+                          border: 2px solid #16a085;
+                          position: relative;
+                          font-weight: bold;
+                        "
+                      >
+                        今すぐ登録
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Malay -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Malay (my) - Floating Style
+                    </div>
+                    <div class="language-content">
+                      <div class="code-example">
+                        &lt;button data-oqtima-trigger data-lang="my"
+                        style="background-color: #e67e22; color: white; border:
+                        none; box-shadow: 0 8px 16px rgba(230, 126, 34, 0.5);
+                        transition: all 0.3s;"
+                        onmouseover="this.style.transform='translateY(-5px)';
+                        this.style.boxShadow='0 12px 24px rgba(230, 126, 34,
+                        0.5)';"
+                        onmouseout="this.style.transform='translateY(0)';
+                        this.style.boxShadow='0 8px 16px rgba(230, 126, 34,
+                        0.5)';" &gt;Daftar Sekarang&lt;/button&gt;
+                      </div>
+                      <button
+                        data-oqtima-trigger
+                        data-lang="my"
+                        style="
+                          background-color: #e67e22;
+                          color: white;
+                          border: none;
+                          box-shadow: 0 8px 16px rgba(230, 126, 34, 0.5);
+                          transition: all 0.3s;
+                        "
+                        onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 24px rgba(230, 126, 34, 0.5)';"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 16px rgba(230, 126, 34, 0.5)';"
+                      >
+                        Daftar Sekarang
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Arabic -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Arabic (ar) - Bold Colored Link
+                    </div>
+                    <div class="language-content rtl-example">
+                      <div class="code-example">
+                        &lt;button data-oqtima-trigger data-lang="ar"
+                        style="color: #34495e; text-decoration: none;
+                        font-weight: bold; border-bottom: 2px solid #e74c3c;
+                        padding-bottom: 2px;" &gt;سجل الآن&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="ar"
+                          style="
+                            color: #34495e;
+                            text-decoration: none;
+                            font-weight: bold;
+                            border-bottom: 2px solid #e74c3c;
+                            padding-bottom: 2px;
+                          "
+                        >
+                          سجل الآن
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Link Examples Subtab -->
+              <div id="normal-link-examples" class="tab-content">
+                <h4>Link Trigger Examples</h4>
+                <p>
+                  Links offer an alternative way to trigger the registration
+                  popup. Here are examples with different styles:
+                </p>
+
+                <div class="language-examples">
+                  <!-- English -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      English (en) - Standard Link
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger
+                        data-lang="en"&gt;Register Now&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a href="#" data-oqtima-trigger data-lang="en"
+                          >Register Now</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- French -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      French (fr) - Bold Link with Arrow
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="fr"
+                        style="font-weight: bold; color: #3498db;
+                        text-decoration: none;" &gt;S'inscrire maintenant
+                        &amp;rarr;&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="fr"
+                          style="
+                            font-weight: bold;
+                            color: #3498db;
+                            text-decoration: none;
+                          "
+                          >S'inscrire maintenant &rarr;</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Spanish -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Spanish (es) - Button-like Link
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="es"
+                        style="display: inline-block; padding: 8px 15px;
+                        background-color: #e74c3c; color: white;
+                        text-decoration: none; border-radius: 4px;"
+                        &gt;Regístrate ahora&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="es"
+                          style="
+                            display: inline-block;
+                            padding: 8px 15px;
+                            background-color: #e74c3c;
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 4px;
+                          "
+                          >Regístrate ahora</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Italian -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Italian (it) - Underline Animation
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="it"
+                        style="color: #16a085; text-decoration: none; position:
+                        relative;" onmouseover="this.style.color = '#1abc9c';
+                        this.style.backgroundImage = 'linear-gradient(to right,
+                        #16a085, #16a085)'; this.style.backgroundSize = '100%
+                        2px'; this.style.backgroundPosition = '0 100%';
+                        this.style.backgroundRepeat = 'no-repeat';"
+                        onmouseout="this.style.color = '#16a085';
+                        this.style.backgroundImage = 'none';" &gt;Registrati
+                        ora&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="it"
+                          style="
+                            color: #16a085;
+                            text-decoration: none;
+                            position: relative;
+                          "
+                          onmouseover="this.style.color = '#1abc9c'; this.style.backgroundImage = 'linear-gradient(to right, #16a085, #16a085)'; this.style.backgroundSize = '100% 2px'; this.style.backgroundPosition = '0 100%'; this.style.backgroundRepeat = 'no-repeat';"
+                          onmouseout="this.style.color = '#16a085'; this.style.backgroundImage = 'none';"
+                          >Registrati ora</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Portuguese -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Brazilian Portuguese (br) - Bordered Link
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="br"
+                        style="display: inline-block; padding: 5px 10px; border:
+                        2px dashed #9b59b6; color: #9b59b6; text-decoration:
+                        none; font-weight: bold;" &gt;Registre-se
+                        agora&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="br"
+                          style="
+                            display: inline-block;
+                            padding: 5px 10px;
+                            border: 2px dashed #9b59b6;
+                            color: #9b59b6;
+                            text-decoration: none;
+                            font-weight: bold;
+                          "
+                          >Registre-se agora</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Vietnamese -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Vietnamese (vn) - Badge Link
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="vn"
+                        style="display: inline-block; padding: 3px 8px;
+                        background-color: #2c3e50; color: white;
+                        text-decoration: none; font-size: 0.9em; border-radius:
+                        3px;" &gt;Đăng ký ngay&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="vn"
+                          style="
+                            display: inline-block;
+                            padding: 3px 8px;
+                            background-color: #2c3e50;
+                            color: white;
+                            text-decoration: none;
+                            font-size: 0.9em;
+                            border-radius: 3px;
+                          "
+                          >Đăng ký ngay</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Thai -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Thai (th) - Dotted Underline
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="th"
+                        style="color: #f39c12; border-bottom: 2px dotted
+                        #f39c12; text-decoration: none; font-weight: bold;
+                        padding-bottom: 2px;" &gt;ลงทะเบียนตอนนี้&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="th"
+                          style="
+                            color: #f39c12;
+                            border-bottom: 2px dotted #f39c12;
+                            text-decoration: none;
+                            font-weight: bold;
+                            padding-bottom: 2px;
+                          "
+                          >ลงทะเบียนตอนนี้</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Chinese Simplified -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Chinese Simplified (cn) - Icon Link
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="cn"
+                        style="color: #c0392b; text-decoration: none;
+                        font-weight: bold;" &gt;⟩ 立即注册&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="cn"
+                          style="
+                            color: #c0392b;
+                            text-decoration: none;
+                            font-weight: bold;
+                          "
+                          >⟩ 立即注册</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Chinese Traditional -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Chinese Traditional (zh) - Highlighted Link
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="zh"
+                        style="background-color: #ffeaa7; color: #2980b9;
+                        text-decoration: none; padding: 0 5px; font-weight:
+                        bold;" &gt;立即註冊&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="zh"
+                          style="
+                            background-color: #ffeaa7;
+                            color: #2980b9;
+                            text-decoration: none;
+                            padding: 0 5px;
+                            font-weight: bold;
+                          "
+                          >立即註冊</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Indonesian -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Indonesian (id) - Capsule Link
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="id"
+                        style="display: inline-block; padding: 5px 15px;
+                        background-color: #8e44ad; color: white;
+                        text-decoration: none; border-radius: 50px; font-size:
+                        0.9em;" &gt;Daftar Sekarang&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="id"
+                          style="
+                            display: inline-block;
+                            padding: 5px 15px;
+                            background-color: #8e44ad;
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 50px;
+                            font-size: 0.9em;
+                          "
+                          >Daftar Sekarang</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Japanese -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Japanese (jp) - Underline on Hover
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="jp"
+                        style="color: #16a085; text-decoration: none;"
+                        onmouseover="this.style.textDecoration = 'underline';"
+                        onmouseout="this.style.textDecoration = 'none';"
+                        &gt;今すぐ登録&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="jp"
+                          style="color: #16a085; text-decoration: none"
+                          onmouseover="this.style.textDecoration = 'underline';"
+                          onmouseout="this.style.textDecoration = 'none';"
+                          >今すぐ登録</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Malay -->
+                  <div class="language-card">
+                    <div class="language-header">Malay (my) - Boxed Link</div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="my"
+                        style="display: inline-block; padding: 6px 12px; border:
+                        1px solid #e67e22; color: #e67e22; text-decoration:
+                        none; transition: all 0.3s;"
+                        onmouseover="this.style.backgroundColor = '#e67e22';
+                        this.style.color = 'white';"
+                        onmouseout="this.style.backgroundColor = 'transparent';
+                        this.style.color = '#e67e22';" &gt;Daftar
+                        Sekarang&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="my"
+                          style="
+                            display: inline-block;
+                            padding: 6px 12px;
+                            border: 1px solid #e67e22;
+                            color: #e67e22;
+                            text-decoration: none;
+                            transition: all 0.3s;
+                          "
+                          onmouseover="this.style.backgroundColor = '#e67e22'; this.style.color = 'white';"
+                          onmouseout="this.style.backgroundColor = 'transparent'; this.style.color = '#e67e22';"
+                          >Daftar Sekarang</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Arabic -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Arabic (ar) - Bold Colored Link
+                    </div>
+                    <div class="language-content rtl-example">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="ar"
+                        style="color: #34495e; text-decoration: none;
+                        font-weight: bold; border-bottom: 2px solid #e74c3c;
+                        padding-bottom: 2px;" &gt;سجل الآن&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="ar"
+                          style="
+                            color: #34495e;
+                            text-decoration: none;
+                            font-weight: bold;
+                            border-bottom: 2px solid #e74c3c;
+                            padding-bottom: 2px;
+                          "
+                        >
+                          سجل الآن
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- IB Referral Tab -->
+          <div id="ib-referral" class="tab-content">
+            <h3>IB Referral Link</h3>
+            <p>
+              When using an IB referral link, include
+              <code>data-referral-type="12"</code> and
+              <code>data-referral-value</code> with your unique IB identifier:
+            </p>
+            <div class="code-example">
+              &lt;button data-oqtima-trigger data-lang="en"
+              data-referral-type="12" data-referral-value="YOUR_IB_ID" &gt;
+              Register With IB Referral &lt;/button&gt;
+            </div>
+
+            <!-- Inner Tab Navigation -->
+            <div
+              class="tab-container comprehensive-examples"
+              style="margin-top: 25px"
+            >
+              <div class="tab-nav">
+                <div
+                  class="tab-button active"
+                  onclick="openSubTab(event, 'ib-button-examples')"
+                >
+                  Button Examples
+                </div>
+                <div
+                  class="tab-button"
+                  onclick="openSubTab(event, 'ib-link-examples')"
+                >
+                  Link Examples
+                </div>
+              </div>
+
+              <!-- Button Examples Subtab -->
+              <div id="ib-button-examples" class="tab-content active">
+                <h4>Button Trigger Examples</h4>
+                <p>
+                  Button examples with IB referral parameters in various styles:
+                </p>
+
+                <div class="language-examples">
+                  <!-- English (en) - Default Style -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      English (en) - Default Style
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="en"
+                        data-referral-type="12"
+                        data-referral-value="YOUR_IB_ID"&gt; Register With
+                        IB&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="en"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                        >
+                          Register With IB
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- French (fr) - Rounded Style -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      French (fr) - Rounded Style
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="fr"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="background-color: #3498db; border-radius:
+                        30px;"&gt; S'inscrire avec IB&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="fr"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="background-color: #3498db; border-radius: 30px"
+                        >
+                          S'inscrire avec IB
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Brazilian Portuguese (br) - Shadow Style -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Brazilian Portuguese (br) - Shadow Style
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="br"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="background-color: #9b59b6; color: white;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.3); border:
+                        none;"&gt; Registre-se com IB&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="br"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            background-color: #9b59b6;
+                            color: white;
+                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                            border: none;
+                          "
+                        >
+                          Registre-se com IB
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Spanish (es) - Outline Style -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Spanish (es) - Outline Style
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="es"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="background-color: transparent; color: #e74c3c;
+                        border: 2px solid #e74c3c; font-weight: bold;"&gt;
+                        Regístrate Con IB&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="es"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            background-color: transparent;
+                            color: #e74c3c;
+                            border: 2px solid #e74c3c;
+                            font-weight: bold;
+                          "
+                        >
+                          Regístrate Con IB
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Vietnamese (vn) - Flat Style -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Vietnamese (vn) - Flat Style
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="vn"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="background-color: #2c3e50; color: white; border:
+                        none; text-transform: uppercase; letter-spacing:
+                        1px;"&gt; Đăng ký với IB&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="vn"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            background-color: #2c3e50;
+                            color: white;
+                            border: none;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                          "
+                        >
+                          Đăng ký với IB
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Thai (th) - 3D Style -->
+                  <div class="language-card">
+                    <div class="language-header">Thai (th) - 3D Style</div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="th"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="background-color: #f39c12; color: white; border:
+                        none; box-shadow: 0 5px 0 #d35400; position: relative;
+                        top: 0; transition: all 0.1s;"
+                        onmousedown="this.style.top='5px';
+                        this.style.boxShadow='none';"
+                        onmouseup="this.style.top='0'; this.style.boxShadow='0
+                        5px 0 #d35400';"&gt;ลงทะเบียนกับ IB&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="th"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            background-color: #f39c12;
+                            color: white;
+                            border: none;
+                            box-shadow: 0 5px 0 #d35400;
+                            position: relative;
+                            top: 0;
+                            transition: all 0.1s;
+                          "
+                          onmousedown="this.style.top='5px'; this.style.boxShadow='none';"
+                          onmouseup="this.style.top='0'; this.style.boxShadow='0 5px 0 #d35400';"
+                        >
+                          ลงทะเบียนกับ IB
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Italian (it) - Gradient Style -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Italian (it) - Gradient Style
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="it"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="background-image: linear-gradient(to right,
+                        #16a085, #27ae60); border: none; color: white;"&gt;
+                        Registrati con IB&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="it"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            background-image: linear-gradient(
+                              to right,
+                              #16a085,
+                              #27ae60
+                            );
+                            border: none;
+                            color: white;
+                          "
+                        >
+                          Registrati con IB
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Chinese Simplified (cn) - Icon Style -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Chinese Simplified (cn) - Icon Style
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="cn"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="background-color: #c0392b; color: white; border:
+                        none; position: relative; padding-left: 35px;"&gt;
+                        &lt;span style="position: absolute; left: 10px; top:
+                        50%; transform: translateY(-50%);"&gt;➜&lt;/span&gt;
+                        通过IB注册&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="cn"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            background-color: #c0392b;
+                            color: white;
+                            border: none;
+                            position: relative;
+                            padding-left: 35px;
+                          "
+                        >
+                          <span
+                            style="
+                              position: absolute;
+                              left: 10px;
+                              top: 50%;
+                              transform: translateY(-50%);
+                            "
+                            >➜</span
+                          >
+                          通过IB注册
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Chinese Traditional (zh) - Pill Style -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Chinese Traditional (zh) - Pill Style
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="zh"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="background-color: #2980b9; color: white; border:
+                        none; border-radius: 50px; padding: 10px 30px;"&gt;
+                        通過IB註冊&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="zh"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            background-color: #2980b9;
+                            color: white;
+                            border: none;
+                            border-radius: 50px;
+                            padding: 10px 30px;
+                          "
+                        >
+                          通過IB註冊
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Indonesian (id) - Animated Style -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Indonesian (id) - Animated Style
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="id"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="background-color: #8e44ad; color: white; border:
+                        none; position: relative; overflow: hidden;"
+                        onmouseover="this.style.backgroundColor='#9b59b6'"
+                        onmouseout="this.style.backgroundColor='#8e44ad'"
+                        &gt;Daftar Sekarang&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="id"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            background-color: #8e44ad;
+                            color: white;
+                            border: none;
+                            position: relative;
+                            overflow: hidden;
+                          "
+                          onmouseover="this.style.backgroundColor='#9b59b6'"
+                          onmouseout="this.style.backgroundColor='#8e44ad'"
+                        >
+                          Daftar Sekarang
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Japanese (jp) - Bordered Style -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Japanese (jp) - Bordered Style
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="jp"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="background-color: white; color: #16a085; border:
+                        2px solid #16a085; position: relative; font-weight:
+                        bold;" &gt;IBで登録&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="jp"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            background-color: white;
+                            color: #16a085;
+                            border: 2px solid #16a085;
+                            position: relative;
+                            font-weight: bold;
+                          "
+                        >
+                          IBで登録
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Malay (my) - Floating Style -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Malay (my) - Floating Style
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="my"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="background-color: #e67e22; color: white; border:
+                        none; box-shadow: 0 8px 16px rgba(230, 126, 34, 0.5);
+                        transition: all 0.3s;"
+                        onmouseover="this.style.transform='translateY(-5px)';
+                        this.style.boxShadow='0 12px 24px rgba(230, 126, 34,
+                        0.5)';"
+                        onmouseout="this.style.transform='translateY(0)';
+                        this.style.boxShadow='0 8px 16px rgba(230, 126, 34,
+                        0.5)';" &gt;Daftar Dengan IB&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="my"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            background-color: #e67e22;
+                            color: white;
+                            border: none;
+                            box-shadow: 0 8px 16px rgba(230, 126, 34, 0.5);
+                            transition: all 0.3s;
+                          "
+                          onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 24px rgba(230, 126, 34, 0.5)';"
+                          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 16px rgba(230, 126, 34, 0.5)';"
+                        >
+                          Daftar Dengan IB
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Arabic (ar) - Bold Colored Link -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Arabic (ar) - Bold Colored Link
+                    </div>
+                    <div class="language-content rtl-example">
+                      <div class="example-code">
+                        &lt;button data-oqtima-trigger data-lang="ar"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="background-color: #34495e; color: white;
+                        font-weight: bold; border: none; box-shadow: inset 0
+                        -4px 0 #e74c3c;" dir="rtl"&gt;سجل مع IB&lt;/button&gt;
+                      </div>
+                      <div class="example-preview">
+                        <button
+                          data-oqtima-trigger
+                          data-lang="ar"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            background-color: #34495e;
+                            color: white;
+                            font-weight: bold;
+                            border: none;
+                            box-shadow: inset 0 -4px 0 #e74c3c;
+                          "
+                          dir="rtl"
+                        >
+                          سجل مع IB
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Link Examples Subtab -->
+              <div id="ib-link-examples" class="tab-content">
+                <h4>Link Trigger Examples</h4>
+                <p>
+                  Link examples with IB referral parameters in various styles:
+                </p>
+
+                <div class="language-examples">
+                  <!-- English (en) - Default Style -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      English (en) - Default Style
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="en"
+                        data-referral-type="12"
+                        data-referral-value="YOUR_IB_ID"&gt; Register With
+                        IB&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="en"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                        >
+                          Register With IB
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- French (fr) - Bold and Underlined -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      French (fr) - Bold and Underlined
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="fr"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="font-weight: bold; text-decoration: underline;
+                        color: #3498db;"&gt;S'inscrire avec IB&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="fr"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            font-weight: bold;
+                            text-decoration: underline;
+                            color: #3498db;
+                          "
+                        >
+                          S'inscrire avec IB
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Brazilian Portuguese (br) - Button Appearance -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Brazilian Portuguese (br) - Button Appearance
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="br"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="display: inline-block; padding: 5px 15px;
+                        background-color: #9b59b6; color: white;
+                        text-decoration: none; border-radius:
+                        5px;"&gt;Registre-se com IB&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="br"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            display: inline-block;
+                            padding: 5px 15px;
+                            background-color: #9b59b6;
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 5px;
+                          "
+                        >
+                          Registre-se com IB
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Spanish (es) - Animated Underline -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Spanish (es) - Animated Underline
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="es"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="text-decoration: none; color: #e74c3c; position:
+                        relative;" onmouseover="this.style.color='#c0392b';"
+                        onmouseout="this.style.color='#e74c3c';"&gt; &lt;span
+                        style="position: relative; display: inline-block;"&gt;
+                        &lt;span style="position: absolute; bottom: -2px; left:
+                        0; width: 0; height: 2px; background-color: #c0392b;
+                        transition: width 0.3s ease-in-out;"
+                        onmouseover="this.style.width='100%'"&gt;&lt;/span&gt;
+                        Regístrate Con IB&lt;/span&gt;&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="es"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            text-decoration: none;
+                            color: #e74c3c;
+                            position: relative;
+                          "
+                          onmouseover="this.style.color='#c0392b'; this.querySelector('span > span').style.width='100%';"
+                          onmouseout="this.style.color='#e74c3c'; this.querySelector('span > span').style.width='0';"
+                        >
+                          <span
+                            style="position: relative; display: inline-block"
+                          >
+                            <span
+                              style="
+                                position: absolute;
+                                bottom: -2px;
+                                left: 0;
+                                width: 0;
+                                height: 2px;
+                                background-color: #c0392b;
+                                transition: width 0.3s ease-in-out;
+                              "
+                            ></span>
+                            Regístrate Con IB
+                          </span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Vietnamese (vn) - Icon Link -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Vietnamese (vn) - Icon Link
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="vn"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="text-decoration: none; color: #2c3e50; display:
+                        flex; align-items: center; font-weight: bold;"&gt;
+                        &lt;span style="margin-right: 5px;"&gt;⚡&lt;/span&gt;
+                        ลงทะเบียนกับ IB&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="vn"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            text-decoration: none;
+                            color: #2c3e50;
+                            display: flex;
+                            align-items: center;
+                            font-weight: bold;
+                          "
+                        >
+                          <span style="margin-right: 5px">⚡</span>
+                          ลงทะเบียนกับ IB
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Thai (th) - Boxed Link -->
+                  <div class="language-card">
+                    <div class="language-header">Thai (th) - Boxed Link</div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="th"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="display: inline-block; border: 2px dashed
+                        #f39c12; padding: 5px 15px; color: #f39c12;
+                        text-decoration: none; transition: all 0.3s;"
+                        onmouseover="this.style.backgroundColor='#f39c12';
+                        this.style.color='white';"
+                        onmouseout="this.style.backgroundColor='transparent';
+                        this.style.color='#f39c12';"&gt; ลงทะเบียนกับ
+                        IB&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="th"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            display: inline-block;
+                            border: 2px dashed #f39c12;
+                            padding: 5px 15px;
+                            color: #f39c12;
+                            text-decoration: none;
+                            transition: all 0.3s;
+                          "
+                          onmouseover="this.style.backgroundColor='#f39c12'; this.style.color='white';"
+                          onmouseout="this.style.backgroundColor='transparent'; this.style.color='#f39c12';"
+                        >
+                          ลงทะเบียนกับ IB
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Italian (it) - Dotted Underline -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Italian (it) - Dotted Underline
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="it"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="text-decoration: none; border-bottom: 2px dotted
+                        #16a085; color: #16a085; font-weight: bold;
+                        padding-bottom: 2px;"&gt;Registrati con IB&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="it"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            text-decoration: none;
+                            border-bottom: 2px dotted #16a085;
+                            color: #16a085;
+                            font-weight: bold;
+                            padding-bottom: 2px;
+                          "
+                        >
+                          Registrati con IB
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Chinese Simplified (cn) - Double Border -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Chinese Simplified (cn) - Double Border
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="cn"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="text-decoration: none; display: inline-block;
+                        position: relative; color: #c0392b; font-weight: bold;
+                        padding: 5px 10px;"&gt; &lt;span style="position:
+                        absolute; top: 0; left: 0; width: 20px; height: 20px;
+                        border-top: 2px solid #c0392b; border-left: 2px solid
+                        #c0392b;"&gt;&lt;/span&gt; &lt;span style="position:
+                        absolute; bottom: 0; right: 0; width: 20px; height:
+                        20px; border-bottom: 2px solid #c0392b; border-right:
+                        2px solid #c0392b;"&gt;&lt;/span&gt;
+                        通过IB注册&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="cn"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            text-decoration: none;
+                            display: inline-block;
+                            position: relative;
+                            color: #c0392b;
+                            font-weight: bold;
+                            padding: 5px 10px;
+                          "
+                        >
+                          <span
+                            style="
+                              position: absolute;
+                              top: 0;
+                              left: 0;
+                              width: 20px;
+                              height: 20px;
+                              border-top: 2px solid #c0392b;
+                              border-left: 2px solid #c0392b;
+                            "
+                          ></span>
+                          <span
+                            style="
+                              position: absolute;
+                              bottom: 0;
+                              right: 0;
+                              width: 20px;
+                              height: 20px;
+                              border-bottom: 2px solid #c0392b;
+                              border-right: 2px solid #c0392b;
+                            "
+                          ></span>
+                          通过IB注册
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Chinese Traditional (zh) - Glowing Effect -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Chinese Traditional (zh) - Glowing Effect
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="zh"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="text-decoration: none; color: #2980b9;
+                        transition: all 0.3s; text-shadow: 0 0 0 rgba(41, 128,
+                        185, 0);" onmouseover="this.style.textShadow='0 0 10px
+                        rgba(41, 128, 185, 0.7)'; this.style.color='#3498db';"
+                        onmouseout="this.style.textShadow='0 0 0 rgba(41, 128,
+                        185, 0)'; this.style.color='#2980b9';"&gt;
+                        通過IB註冊&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="zh"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            text-decoration: none;
+                            color: #2980b9;
+                            transition: all 0.3s;
+                            text-shadow: 0 0 0 rgba(41, 128, 185, 0);
+                          "
+                          onmouseover="this.style.textShadow='0 0 10px rgba(41, 128, 185, 0.7)'; this.style.color='#3498db';"
+                          onmouseout="this.style.textShadow='0 0 0 rgba(41, 128, 185, 0)'; this.style.color='#2980b9';"
+                        >
+                          通過IB註冊
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Indonesian (id) - Arrow Link -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Indonesian (id) - Arrow Link
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="id"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="text-decoration: none; color: #8e44ad; display:
+                        inline-flex; align-items: center;"&gt; Daftar Dengan IB
+                        &lt;span style="margin-left: 5px; transition: transform
+                        0.3s;"&gt;→&lt;/span&gt;&lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="id"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            text-decoration: none;
+                            color: #8e44ad;
+                            display: inline-flex;
+                            align-items: center;
+                          "
+                          onmouseover="this.querySelector('span').style.transform='translateX(5px)';"
+                          onmouseout="this.querySelector('span').style.transform='translateX(0)';"
+                        >
+                          Daftar Dengan IB
+                          <span
+                            style="margin-left: 5px; transition: transform 0.3s"
+                            >→</span
+                          >
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Japanese (jp) - Border Bottom Animation -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Japanese (jp) - Border Bottom Animation
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="jp"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="text-decoration: none; color: #16a085; display:
+                        inline-block; position: relative;"&gt; IBで登録 &lt;span
+                        style="position: absolute; bottom: -2px; left: 50%;
+                        width: 0; height: 2px; background: #16a085; transition:
+                        all 0.3s ease; transform:
+                        translateX(-50%);"&gt;&lt;/span&gt; &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="jp"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            text-decoration: none;
+                            color: #16a085;
+                            display: inline-block;
+                            position: relative;
+                          "
+                          onmouseover="this.querySelector('span').style.width='100%';"
+                          onmouseout="this.querySelector('span').style.width='0';"
+                        >
+                          IBで登録
+                          <span
+                            style="
+                              position: absolute;
+                              bottom: -2px;
+                              left: 50%;
+                              width: 0;
+                              height: 2px;
+                              background: #16a085;
+                              transition: all 0.3s ease;
+                              transform: translateX(-50%);
+                            "
+                          ></span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Malay (my) - Highlight Effect -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Malay (my) - Highlight Effect
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="my"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="text-decoration: none; color: #e67e22; position:
+                        relative; z-index: 1;"&gt; &lt;span style="position:
+                        relative; z-index: 1;"&gt;Daftar Dengan IB&lt;/span&gt;
+                        &lt;span style="position: absolute; bottom: 0; left: 0;
+                        width: 100%; height: 0; background-color: rgba(230, 126,
+                        34, 0.2); z-index: -1; transition: height 0.3s
+                        ease;"&gt;&lt;/span&gt; &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="my"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            text-decoration: none;
+                            color: #e67e22;
+                            position: relative;
+                            z-index: 1;
+                          "
+                          onmouseover="this.querySelector('span:last-child').style.height='100%';"
+                          onmouseout="this.querySelector('span:last-child').style.height='0';"
+                        >
+                          <span style="position: relative; z-index: 1"
+                            >Daftar Dengan IB</span
+                          >
+                          <span
+                            style="
+                              position: absolute;
+                              bottom: 0;
+                              left: 0;
+                              width: 100%;
+                              height: 0;
+                              background-color: rgba(230, 126, 34, 0.2);
+                              z-index: -1;
+                              transition: height 0.3s ease;
+                            "
+                          ></span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Arabic (ar) - Sliding Border -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Arabic (ar) - Sliding Border
+                    </div>
+                    <div class="language-content rtl-example">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="ar"
+                        data-referral-type="12" data-referral-value="YOUR_IB_ID"
+                        style="text-decoration: none; color: #34495e;
+                        font-weight: bold; display: inline-block; position:
+                        relative;" dir="rtl"&gt; &lt;span style="position:
+                        relative; z-index: 1;"&gt;سجل مع IB&lt;/span&gt;
+                        &lt;span style="position: absolute; bottom: -2px; right:
+                        0; width: 0; height: 2px; background-color: #e74c3c;
+                        transition: width 0.3s;"&gt;&lt;/span&gt; &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="ar"
+                          data-referral-type="12"
+                          data-referral-value="IB08801328J"
+                          style="
+                            text-decoration: none;
+                            color: #34495e;
+                            font-weight: bold;
+                            display: inline-block;
+                            position: relative;
+                          "
+                          dir="rtl"
+                          onmouseover="this.querySelector('span:last-child').style.width='100%';"
+                          onmouseout="this.querySelector('span:last-child').style.width='0';"
+                        >
+                          <span style="position: relative; z-index: 1"
+                            >سجل مع IB</span
+                          >
+                          <span
+                            style="
+                              position: absolute;
+                              bottom: -2px;
+                              right: 0;
+                              width: 0;
+                              height: 2px;
+                              background-color: #e74c3c;
+                              transition: width 0.3s;
+                            "
+                          ></span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Campaign Link Tab -->
+          <div id="campaign-link" class="tab-content">
+            <h3>Campaign Link</h3>
+            <p>
+              For campaign-specific registrations, include
+              <code>data-referral-type="14"</code> and
+              <code>data-referral-value</code> with your unique campaign
+              identifier:
+            </p>
+            <div class="code-example">
+              &lt;button data-oqtima-trigger data-lang="en"
+              data-referral-type="14" data-referral-value="YOUR_CAMPAIGN_ID"
+              &gt; Register From Campaign &lt;/button&gt;
+            </div>
+
+            <!-- Inner Tab Navigation -->
+            <div
+              class="tab-container comprehensive-examples"
+              style="margin-top: 25px"
+            >
+              <div class="tab-nav">
+                <div
+                  class="tab-button active"
+                  onclick="openSubTab(event, 'campaign-button-examples')"
+                >
+                  Button Examples
+                </div>
+                <div
+                  class="tab-button"
+                  onclick="openSubTab(event, 'campaign-link-examples')"
+                >
+                  Link Examples
+                </div>
+              </div>
+
+              <!-- Button Examples Subtab -->
+              <div id="campaign-button-examples" class="tab-content active">
+                <h4>Button Trigger Examples</h4>
+                <p>
+                  Button examples with campaign parameters with various styles:
+                </p>
+
+                <div class="example-grid">
+                  <!-- English (en) - Default Style -->
+                  <div class="example-item">
+                    <div class="example-title">
+                      English (en) - Default Style
+                    </div>
+                    <div class="example-code">
+                      &lt;button data-oqtima-trigger data-lang="en"
+                      data-referral-type="14"
+                      data-referral-value="YOUR_CAMPAIGN_ID" &gt; Join Campaign
+                      &lt;/button&gt;
+                    </div>
+                    <div class="example-preview">
+                      <button
+                        data-oqtima-trigger
+                        data-lang="en"
+                        data-referral-type="14"
+                        data-referral-value="SVRQb3B1cFJFRw"
+                      >
+                        Join Campaign
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- French (fr) - Rounded Style -->
+                  <div class="example-item">
+                    <div class="example-title">French (fr) - Rounded Style</div>
+                    <div class="example-code">
+                      &lt;button data-oqtima-trigger data-lang="fr"
+                      data-referral-type="14"
+                      data-referral-value="YOUR_CAMPAIGN_ID"
+                      style="border-radius: 25px; background-color: #3f51b5;
+                      color: white; border: none; padding: 10px 20px;" &gt;
+                      Rejoindre la Campagne &lt;/button&gt;
+                    </div>
+                    <div class="example-preview">
+                      <button
+                        data-oqtima-trigger
+                        data-lang="fr"
+                        data-referral-type="14"
+                        data-referral-value="SVRQb3B1cFJFRw"
+                        style="
+                          border-radius: 25px;
+                          background-color: #3f51b5;
+                          color: white;
+                          border: none;
+                          padding: 10px 20px;
+                        "
+                      >
+                        Rejoindre la Campagne
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Brazilian Portuguese (br) - Shadow Style -->
+                  <div class="example-item">
+                    <div class="example-title">
+                      Brazilian Portuguese (br) - Shadow Style
+                    </div>
+                    <div class="example-code">
+                      &lt;button data-oqtima-trigger data-lang="br"
+                      data-referral-type="14"
+                      data-referral-value="YOUR_CAMPAIGN_ID" style="box-shadow:
+                      0 4px 8px rgba(0,0,0,0.3); background-color: #009688;
+                      color: white; border: none; padding: 10px 20px;" &gt;
+                      Participar da Campanha &lt;/button&gt;
+                    </div>
+                    <div class="example-preview">
+                      <button
+                        data-oqtima-trigger
+                        data-lang="br"
+                        data-referral-type="14"
+                        data-referral-value="SVRQb3B1cFJFRw"
+                        style="
+                          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                          background-color: #009688;
+                          color: white;
+                          border: none;
+                          padding: 10px 20px;
+                        "
+                      >
+                        Participar da Campanha
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Spanish (es) - Outline Style -->
+                  <div class="example-item">
+                    <div class="example-title">
+                      Spanish (es) - Outline Style
+                    </div>
+                    <div class="example-code">
+                      &lt;button data-oqtima-trigger data-lang="es"
+                      data-referral-type="14"
+                      data-referral-value="YOUR_CAMPAIGN_ID"
+                      style="background-color: transparent; color: #f44336;
+                      border: 2px solid #f44336; padding: 10px 20px;
+                      font-weight: bold;" &gt; Unirse a la Campaña
+                      &lt;/button&gt;
+                    </div>
+                    <div class="example-preview">
+                      <button
+                        data-oqtima-trigger
+                        data-lang="es"
+                        data-referral-type="14"
+                        data-referral-value="SVRQb3B1cFJFRw"
+                        style="
+                          background-color: transparent;
+                          color: #f44336;
+                          border: 2px solid #f44336;
+                          padding: 10px 20px;
+                          font-weight: bold;
+                        "
+                      >
+                        Unirse a la Campaña
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Vietnamese (vn) - Flat Style -->
+                  <div class="example-item">
+                    <div class="example-title">
+                      Vietnamese (vn) - Flat Style
+                    </div>
+                    <div class="example-code">
+                      &lt;button data-oqtima-trigger data-lang="vn"
+                      data-referral-type="14"
+                      data-referral-value="YOUR_CAMPAIGN_ID"
+                      style="background-color: #FF9800; color: white; border:
+                      none; padding: 12px 25px; text-transform: uppercase;
+                      letter-spacing: 1px;" &gt; Tham gia Chiến dịch
+                      &lt;/button&gt;
+                    </div>
+                    <div class="example-preview">
+                      <button
+                        data-oqtima-trigger
+                        data-lang="vn"
+                        data-referral-type="14"
+                        data-referral-value="SVRQb3B1cFJFRw"
+                        style="
+                          background-color: #ff9800;
+                          color: white;
+                          border: none;
+                          padding: 12px 25px;
+                          text-transform: uppercase;
+                          letter-spacing: 1px;
+                        "
+                      >
+                        Tham gia Chiến dịch
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Thai (th) - 3D Style -->
+                  <div class="example-item">
+                    <div class="example-title">Thai (th) - 3D Style</div>
+                    <div class="example-code">
+                      &lt;button data-oqtima-trigger data-lang="th"
+                      data-referral-type="14"
+                      data-referral-value="YOUR_CAMPAIGN_ID"
+                      style="background-color: #4CAF50; color: white; border:
+                      none; padding: 10px 20px; box-shadow: 0 8px 0 #2E7D32;
+                      position: relative; top: 0; transition: all 0.1s;"
+                      onmousedown="this.style.top='4px'; this.style.boxShadow='0
+                      4px 0 #2E7D32';" onmouseup="this.style.top='0';
+                      this.style.boxShadow='0 8px 0 #2E7D32';" &gt;
+                      เข้าร่วมแคมเปญ &lt;/button&gt;
+                    </div>
+                    <div class="example-preview">
+                      <button
+                        data-oqtima-trigger
+                        data-lang="th"
+                        data-referral-type="14"
+                        data-referral-value="SVRQb3B1cFJFRw"
+                        style="
+                          background-color: #4caf50;
+                          color: white;
+                          border: none;
+                          padding: 10px 20px;
+                          box-shadow: 0 8px 0 #2e7d32;
+                          position: relative;
+                          top: 0;
+                          transition: all 0.1s;
+                        "
+                        onmousedown="this.style.top='4px'; this.style.boxShadow='0 4px 0 #2E7D32';"
+                        onmouseup="this.style.top='0'; this.style.boxShadow='0 8px 0 #2E7D32';"
+                      >
+                        เข้าร่วมแคมเปญ
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Italian (it) - Gradient Style -->
+                  <div class="example-item">
+                    <div class="example-title">
+                      Italian (it) - Gradient Style
+                    </div>
+                    <div class="example-code">
+                      &lt;button data-oqtima-trigger data-lang="it"
+                      data-referral-type="14"
+                      data-referral-value="YOUR_CAMPAIGN_ID" style="background:
+                      linear-gradient(135deg, #673AB7, #3F51B5); color: white;
+                      border: none; padding: 10px 20px; border-radius: 5px;"
+                      &gt; Partecipa alla Campagna &lt;/button&gt;
+                    </div>
+                    <div class="example-preview">
+                      <button
+                        data-oqtima-trigger
+                        data-lang="it"
+                        data-referral-type="14"
+                        data-referral-value="SVRQb3B1cFJFRw"
+                        style="
+                          background: linear-gradient(135deg, #673ab7, #3f51b5);
+                          color: white;
+                          border: none;
+                          padding: 10px 20px;
+                          border-radius: 5px;
+                        "
+                      >
+                        Partecipa alla Campagna
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Chinese Simplified (cn) - Icon Style -->
+                  <div class="example-item">
+                    <div class="example-title">
+                      Chinese Simplified (cn) - Icon Style
+                    </div>
+                    <div class="example-code">
+                      &lt;button data-oqtima-trigger data-lang="cn"
+                      data-referral-type="14"
+                      data-referral-value="YOUR_CAMPAIGN_ID"
+                      style="background-color: #E91E63; color: white; border:
+                      none; padding: 10px 20px; display: flex; align-items:
+                      center; gap: 8px; border-radius: 4px;" &gt; &lt;span
+                      style="font-size: 1.2em;">🎯&lt;/span&gt; 加入活动
+                      &lt;/button&gt;
+                    </div>
+                    <div class="example-preview">
+                      <button
+                        data-oqtima-trigger
+                        data-lang="cn"
+                        data-referral-type="14"
+                        data-referral-value="SVRQb3B1cFJFRw"
+                        style="
+                          background-color: #e91e63;
+                          color: white;
+                          border: none;
+                          padding: 10px 20px;
+                          display: flex;
+                          align-items: center;
+                          gap: 8px;
+                          border-radius: 4px;
+                        "
+                      >
+                        <span style="font-size: 1.2em">🎯</span> 加入活动
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Chinese Traditional (zh) - Pill Style -->
+                  <div class="example-item">
+                    <div class="example-title">
+                      Chinese Traditional (zh) - Pill Style
+                    </div>
+                    <div class="example-code">
+                      &lt;button data-oqtima-trigger data-lang="zh"
+                      data-referral-type="14"
+                      data-referral-value="YOUR_CAMPAIGN_ID"
+                      style="background-color: #2196F3; color: white; border:
+                      none; padding: 12px 30px; border-radius: 50px;
+                      font-weight: bold; letter-spacing: 1px;" &gt; 加入活動
+                      &lt;/button&gt;
+                    </div>
+                    <div class="example-preview">
+                      <button
+                        data-oqtima-trigger
+                        data-lang="zh"
+                        data-referral-type="14"
+                        data-referral-value="SVRQb3B1cFJFRw"
+                        style="
+                          background-color: #2196f3;
+                          color: white;
+                          border: none;
+                          padding: 12px 30px;
+                          border-radius: 50px;
+                          font-weight: bold;
+                          letter-spacing: 1px;
+                        "
+                      >
+                        加入活動
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Indonesian (id) - Animated Style -->
+                  <div class="example-item">
+                    <div class="example-title">
+                      Indonesian (id) - Animated Style
+                    </div>
+                    <div class="example-code">
+                      &lt;button data-oqtima-trigger data-lang="id"
+                      data-referral-type="14"
+                      data-referral-value="YOUR_CAMPAIGN_ID"
+                      style="background-color: #7E57C2; color: white; border:
+                      none; padding: 10px 25px; border-radius: 5px; position:
+                      relative; overflow: hidden;"
+                      onmouseover="this.style.transform='scale(1.05)';
+                      this.style.transition='all 0.3s ease';"
+                      onmouseout="this.style.transform='scale(1)';
+                      this.style.transition='all 0.3s ease';" &gt; Bergabung
+                      dengan Kampanye &lt;/button&gt;
+                    </div>
+                    <div class="example-preview">
+                      <button
+                        data-oqtima-trigger
+                        data-lang="id"
+                        data-referral-type="14"
+                        data-referral-value="SVRQb3B1cFJFRw"
+                        style="
+                          background-color: #7e57c2;
+                          color: white;
+                          border: none;
+                          padding: 10px 25px;
+                          border-radius: 5px;
+                          position: relative;
+                          overflow: hidden;
+                        "
+                        onmouseover="this.style.transform='scale(1.05)'; this.style.transition='all 0.3s ease';"
+                        onmouseout="this.style.transform='scale(1)'; this.style.transition='all 0.3s ease';"
+                      >
+                        Bergabung dengan Kampanye
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Japanese (jp) - Bordered Style -->
+                  <div class="example-item">
+                    <div class="example-title">
+                      Japanese (jp) - Bordered Style
+                    </div>
+                    <div class="example-code">
+                      &lt;button data-oqtima-trigger data-lang="jp"
+                      data-referral-type="14"
+                      data-referral-value="YOUR_CAMPAIGN_ID"
+                      style="background-color: white; color: #795548; border:
+                      2px solid #795548; padding: 10px 20px; position:
+                      relative;"
+                      onmouseover="this.style.backgroundColor='#795548';
+                      this.style.color='white'; this.style.transition='all
+                      0.3s';" onmouseout="this.style.backgroundColor='white';
+                      this.style.color='#795548'; this.style.transition='all
+                      0.3s';" &gt; キャンペーンに参加 &lt;/button&gt;
+                    </div>
+                    <div class="example-preview">
+                      <button
+                        data-oqtima-trigger
+                        data-lang="jp"
+                        data-referral-type="14"
+                        data-referral-value="SVRQb3B1cFJFRw"
+                        style="
+                          background-color: white;
+                          color: #795548;
+                          border: 2px solid #795548;
+                          padding: 10px 20px;
+                          position: relative;
+                        "
+                        onmouseover="this.style.backgroundColor='#795548'; this.style.color='white'; this.style.transition='all 0.3s';"
+                        onmouseout="this.style.backgroundColor='white'; this.style.color='#795548'; this.style.transition='all 0.3s';"
+                      >
+                        キャンペーンに参加
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Malay (my) - Floating Style -->
+                  <div class="example-item">
+                    <div class="example-title">Malay (my) - Floating Style</div>
+                    <div class="example-code">
+                      &lt;button data-oqtima-trigger data-lang="my"
+                      data-referral-type="14"
+                      data-referral-value="YOUR_CAMPAIGN_ID"
+                      style="background-color: #00BCD4; color: white; border:
+                      none; padding: 12px 25px; border-radius: 4px; box-shadow:
+                      0 2px 10px rgba(0, 188, 212, 0.5); transition: all 0.3s;"
+                      onmouseover="this.style.transform='translateY(-5px)';
+                      this.style.boxShadow='0 7px 20px rgba(0, 188, 212, 0.7)';"
+                      onmouseout="this.style.transform='translateY(0)';
+                      this.style.boxShadow='0 2px 10px rgba(0, 188, 212, 0.5)';"
+                      &gt; Sertai Kempen &lt;/button&gt;
+                    </div>
+                    <div class="example-preview">
+                      <button
+                        data-oqtima-trigger
+                        data-lang="my"
+                        data-referral-type="14"
+                        data-referral-value="SVRQb3B1cFJFRw"
+                        style="
+                          background-color: #00bcd4;
+                          color: white;
+                          border: none;
+                          padding: 12px 25px;
+                          border-radius: 4px;
+                          box-shadow: 0 2px 10px rgba(0, 188, 212, 0.5);
+                          transition: all 0.3s;
+                        "
+                        onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 7px 20px rgba(0, 188, 212, 0.7)';"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 10px rgba(0, 188, 212, 0.5)';"
+                      >
+                        Sertai Kempen
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Arabic (ar) - Bold Style -->
+                  <div class="example-item">
+                    <div class="example-title">Arabic (ar) - Bold Style</div>
+                    <div class="example-code">
+                      &lt;button data-oqtima-trigger data-lang="ar"
+                      data-referral-type="14"
+                      data-referral-value="YOUR_CAMPAIGN_ID"
+                      style="background-color: #8BC34A; color: white; border:
+                      none; padding: 10px 25px; font-weight: bold;
+                      border-radius: 0; position: relative; text-align: center;
+                      direction: rtl;"
+                      onmouseover="this.style.backgroundColor='#689F38';
+                      this.style.transition='background-color 0.3s';"
+                      onmouseout="this.style.backgroundColor='#8BC34A';
+                      this.style.transition='background-color 0.3s';" &gt; انضم
+                      إلى الحملة &lt;/button&gt;
+                    </div>
+                    <div class="example-preview">
+                      <button
+                        data-oqtima-trigger
+                        data-lang="ar"
+                        data-referral-type="14"
+                        data-referral-value="SVRQb3B1cFJFRw"
+                        style="
+                          background-color: #8bc34a;
+                          color: white;
+                          border: none;
+                          padding: 10px 25px;
+                          font-weight: bold;
+                          border-radius: 0;
+                          position: relative;
+                          text-align: center;
+                          direction: rtl;
+                        "
+                        onmouseover="this.style.backgroundColor='#689F38'; this.style.transition='background-color 0.3s';"
+                        onmouseout="this.style.backgroundColor='#8BC34A'; this.style.transition='background-color 0.3s';"
+                      >
+                        انضم إلى الحملة
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Link Examples Subtab for Campaign Link -->
+              <div id="campaign-link-examples" class="tab-content">
+                <h4>Link Trigger Examples</h4>
+                <p>Link examples with campaign parameters in various styles:</p>
+
+                <div class="language-examples">
+                  <!-- English (en) - Standard Link -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      English (en) - Standard Link
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="en"
+                        data-referral-type="14"
+                        data-referral-value="YOUR_CAMPAIGN_ID"&gt; Join Campaign
+                        &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="en"
+                          data-referral-type="14"
+                          data-referral-value="SVRQb3B1cFJFRw"
+                        >
+                          Join Campaign
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- French (fr) - Gradient Underline -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      French (fr) - Gradient Underline
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="fr"
+                        data-referral-type="14"
+                        data-referral-value="YOUR_CAMPAIGN_ID" style="color:
+                        #3498db; text-decoration: none; position: relative;
+                        font-weight: bold;"
+                        onmouseover="this.style.backgroundImage='linear-gradient(90deg,
+                        #3498db, #9b59b6)'; this.style.backgroundSize='100%
+                        2px'; this.style.backgroundPosition='left bottom';
+                        this.style.backgroundRepeat='no-repeat';"
+                        onmouseout="this.style.backgroundImage='none'"&gt;
+                        Rejoindre la Campagne &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="fr"
+                          data-referral-type="14"
+                          data-referral-value="SVRQb3B1cFJFRw"
+                          style="
+                            color: #3498db;
+                            text-decoration: none;
+                            position: relative;
+                            font-weight: bold;
+                          "
+                          onmouseover="this.style.backgroundImage='linear-gradient(90deg, #3498db, #9b59b6)'; this.style.backgroundSize='100% 2px'; this.style.backgroundPosition='left bottom'; this.style.backgroundRepeat='no-repeat';"
+                          onmouseout="this.style.backgroundImage='none'"
+                        >
+                          Rejoindre la Campagne
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Brazilian Portuguese (br) - Pill Button -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Brazilian Portuguese (br) - Pill Button
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="br"
+                        data-referral-type="14"
+                        data-referral-value="YOUR_CAMPAIGN_ID" style="display:
+                        inline-block; padding: 8px 20px; background-color:
+                        #9b59b6; color: white; text-decoration: none;
+                        border-radius: 50px; box-shadow: 0 2px 5px
+                        rgba(0,0,0,0.2); transition: transform 0.2s ease;"
+                        onmouseover="this.style.transform='scale(1.05)'"
+                        onmouseout="this.style.transform='scale(1)'"&gt;
+                        Participar da Campanha &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="br"
+                          data-referral-type="14"
+                          data-referral-value="SVRQb3B1cFJFRw"
+                          style="
+                            display: inline-block;
+                            padding: 8px 20px;
+                            background-color: #9b59b6;
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 50px;
+                            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                            transition: transform 0.2s ease;
+                          "
+                          onmouseover="this.style.transform='scale(1.05)'"
+                          onmouseout="this.style.transform='scale(1)'"
+                        >
+                          Participar da Campanha
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Vietnamese (vn) - Border Highlight -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Vietnamese (vn) - Border Highlight
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="vn"
+                        data-referral-type="14"
+                        data-referral-value="YOUR_CAMPAIGN_ID" style="display:
+                        inline-block; padding: 6px 12px; border: 2px solid
+                        #2c3e50; color: #2c3e50; text-decoration: none;
+                        font-weight: bold; transition: all 0.3s ease;"
+                        onmouseover="this.style.backgroundColor='#2c3e50';
+                        this.style.color='white';"
+                        onmouseout="this.style.backgroundColor='transparent';
+                        this.style.color='#2c3e50';"&gt; Tham gia Chiến dịch
+                        &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="vn"
+                          data-referral-type="14"
+                          data-referral-value="SVRQb3B1cFJFRw"
+                          style="
+                            display: inline-block;
+                            padding: 6px 12px;
+                            border: 2px solid #2c3e50;
+                            color: #2c3e50;
+                            text-decoration: none;
+                            font-weight: bold;
+                            transition: all 0.3s ease;
+                          "
+                          onmouseover="this.style.backgroundColor='#2c3e50'; this.style.color='white';"
+                          onmouseout="this.style.backgroundColor='transparent'; this.style.color='#2c3e50';"
+                        >
+                          Tham gia Chiến dịch
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Thai (th) - Dotted Underline with Icon -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Thai (th) - Dotted Underline with Icon
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="th"
+                        data-referral-type="14"
+                        data-referral-value="YOUR_CAMPAIGN_ID" style="color:
+                        #f39c12; border-bottom: 2px dotted #f39c12;
+                        text-decoration: none; font-weight: bold;
+                        padding-bottom: 2px; display: inline-flex; align-items:
+                        center;"&gt; เข้าร่วมแคมเปญ &lt;span style="margin-left:
+                        5px; font-size: 1.2em;"&gt;&#9733;&lt;/span&gt;
+                        &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="th"
+                          data-referral-type="14"
+                          data-referral-value="SVRQb3B1cFJFRw"
+                          style="
+                            color: #f39c12;
+                            border-bottom: 2px dotted #f39c12;
+                            text-decoration: none;
+                            font-weight: bold;
+                            padding-bottom: 2px;
+                            display: inline-flex;
+                            align-items: center;
+                          "
+                        >
+                          เข้าร่วมแคมเปญ
+                          <span style="margin-left: 5px; font-size: 1.2em"
+                            >&#9733;</span
+                          >
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Spanish (es) - Background Animation -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Spanish (es) - Background Animation
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="es"
+                        data-referral-type="14"
+                        data-referral-value="YOUR_CAMPAIGN_ID" style="display:
+                        inline-block; padding: 8px 16px; color: white;
+                        background: linear-gradient(90deg, #e74c3c, #c0392b);
+                        text-decoration: none; border-radius: 4px;
+                        background-size: 200% 100%; transition:
+                        background-position 0.5s ease;"
+                        onmouseover="this.style.backgroundPosition='right
+                        center';"
+                        onmouseout="this.style.backgroundPosition='left
+                        center';"&gt; Unirse a la Campaña &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="es"
+                          data-referral-type="14"
+                          data-referral-value="SVRQb3B1cFJFRw"
+                          style="
+                            display: inline-block;
+                            padding: 8px 16px;
+                            color: white;
+                            background: linear-gradient(
+                              90deg,
+                              #e74c3c,
+                              #c0392b
+                            );
+                            text-decoration: none;
+                            border-radius: 4px;
+                            background-size: 200% 100%;
+                            transition: background-position 0.5s ease;
+                          "
+                          onmouseover="this.style.backgroundPosition='right center';"
+                          onmouseout="this.style.backgroundPosition='left center';"
+                        >
+                          Unirse a la Campaña
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Italian (it) - Sliding Border -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Italian (it) - Sliding Border
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="it"
+                        data-referral-type="14"
+                        data-referral-value="YOUR_CAMPAIGN_ID" style="position:
+                        relative; color: #16a085; text-decoration: none;
+                        font-weight: bold; padding: 5px 0;"
+                        onmouseover="this.querySelector('span').style.width='100%';"
+                        onmouseout="this.querySelector('span').style.width='0%';"&gt;
+                        Partecipa alla Campagna &lt;span style="position:
+                        absolute; left: 0; bottom: 0; width: 0; height: 2px;
+                        background-color: #16a085; transition: width 0.3s
+                        ease;"&gt;&lt;/span&gt; &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="it"
+                          data-referral-type="14"
+                          data-referral-value="SVRQb3B1cFJFRw"
+                          style="
+                            position: relative;
+                            color: #16a085;
+                            text-decoration: none;
+                            font-weight: bold;
+                            padding: 5px 0;
+                          "
+                          onmouseover="this.querySelector('span').style.width='100%';"
+                          onmouseout="this.querySelector('span').style.width='0%';"
+                        >
+                          Partecipa alla Campagna
+                          <span
+                            style="
+                              position: absolute;
+                              left: 0;
+                              bottom: 0;
+                              width: 0;
+                              height: 2px;
+                              background-color: #16a085;
+                              transition: width 0.3s ease;
+                            "
+                          ></span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Chinese Simplified (cn) - Shadow Effect -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Chinese Simplified (cn) - Shadow Effect
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="cn"
+                        data-referral-type="14"
+                        data-referral-value="YOUR_CAMPAIGN_ID" style="display:
+                        inline-block; padding: 8px 15px; background-color:
+                        #c0392b; color: white; text-decoration: none;
+                        border-radius: 4px; box-shadow: 0 0 0 rgba(192, 57, 43,
+                        0.4); transition: box-shadow 0.3s ease;"
+                        onmouseover="this.style.boxShadow='0 0 10px rgba(192,
+                        57, 43, 0.7)';" onmouseout="this.style.boxShadow='0 0 0
+                        rgba(192, 57, 43, 0.4)';"&gt; 加入活动 &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="cn"
+                          data-referral-type="14"
+                          data-referral-value="SVRQb3B1cFJFRw"
+                          style="
+                            display: inline-block;
+                            padding: 8px 15px;
+                            background-color: #c0392b;
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 4px;
+                            box-shadow: 0 0 0 rgba(192, 57, 43, 0.4);
+                            transition: box-shadow 0.3s ease;
+                          "
+                          onmouseover="this.style.boxShadow='0 0 10px rgba(192, 57, 43, 0.7)';"
+                          onmouseout="this.style.boxShadow='0 0 0 rgba(192, 57, 43, 0.4)';"
+                        >
+                          加入活动
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Chinese Traditional (zh) - Bubble Effect -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Chinese Traditional (zh) - Bubble Effect
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="zh"
+                        data-referral-type="14"
+                        data-referral-value="YOUR_CAMPAIGN_ID" style="position:
+                        relative; display: inline-block; color: #2980b9;
+                        text-decoration: none; font-weight: bold; padding: 8px
+                        15px; z-index: 1; overflow: hidden;"
+                        onmouseover="this.querySelector('span').style.transform='scale(1)';"
+                        onmouseout="this.querySelector('span').style.transform='scale(0)';"&gt;
+                        加入活動 &lt;span style="position: absolute; left: 0;
+                        top: 0; width: 100%; height: 100%; background-color:
+                        rgba(41, 128, 185, 0.1); border-radius: 50%; transform:
+                        scale(0); transition: transform 0.5s ease; z-index:
+                        -1;"&gt;&lt;/span&gt; &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="zh"
+                          data-referral-type="14"
+                          data-referral-value="SVRQb3B1cFJFRw"
+                          style="
+                            position: relative;
+                            display: inline-block;
+                            color: #2980b9;
+                            text-decoration: none;
+                            font-weight: bold;
+                            padding: 8px 15px;
+                            z-index: 1;
+                            overflow: hidden;
+                          "
+                          onmouseover="this.querySelector('span').style.transform='scale(1)';"
+                          onmouseout="this.querySelector('span').style.transform='scale(0)';"
+                        >
+                          加入活動
+                          <span
+                            style="
+                              position: absolute;
+                              left: 0;
+                              top: 0;
+                              width: 100%;
+                              height: 100%;
+                              background-color: rgba(41, 128, 185, 0.1);
+                              border-radius: 50%;
+                              transform: scale(0);
+                              transition: transform 0.5s ease;
+                              z-index: -1;
+                            "
+                          ></span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Indonesian (id) - Arrow Animation -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Indonesian (id) - Arrow Animation
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="id"
+                        data-referral-type="14"
+                        data-referral-value="YOUR_CAMPAIGN_ID" style="display:
+                        inline-flex; align-items: center; color: #8e44ad;
+                        text-decoration: none; font-weight: bold;"
+                        onmouseover="this.querySelector('span').style.transform='translateX(8px)';"
+                        onmouseout="this.querySelector('span').style.transform='translateX(0)';"&gt;
+                        Bergabung dengan Kampanye &lt;span style="margin-left:
+                        8px; transition: transform 0.3s ease; display:
+                        inline-block;"&gt;→&lt;/span&gt; &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="id"
+                          data-referral-type="14"
+                          data-referral-value="SVRQb3B1cFJFRw"
+                          style="
+                            display: inline-flex;
+                            align-items: center;
+                            color: #8e44ad;
+                            text-decoration: none;
+                            font-weight: bold;
+                          "
+                          onmouseover="this.querySelector('span').style.transform='translateX(8px)';"
+                          onmouseout="this.querySelector('span').style.transform='translateX(0)';"
+                        >
+                          Bergabung dengan Kampanye
+                          <span
+                            style="
+                              margin-left: 8px;
+                              transition: transform 0.3s ease;
+                              display: inline-block;
+                            "
+                            >→</span
+                          >
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Japanese (jp) - Bordered Box -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Japanese (jp) - Bordered Box
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="jp"
+                        data-referral-type="14"
+                        data-referral-value="YOUR_CAMPAIGN_ID" style="display:
+                        inline-block; padding: 8px 15px; border: 1px solid
+                        #c0392b; color: #c0392b; text-decoration: none;
+                        position: relative; transition: color 0.3s ease;"
+                        onmouseover="this.style.color='white';
+                        this.querySelector('span').style.height='100%';"
+                        onmouseout="this.style.color='#c0392b';
+                        this.querySelector('span').style.height='0%';"&gt;
+                        キャンペーンに参加 &lt;span style="position: absolute;
+                        bottom: 0; left: 0; width: 100%; height: 0;
+                        background-color: #c0392b; z-index: -1; transition:
+                        height 0.3s ease;"&gt;&lt;/span&gt; &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="jp"
+                          data-referral-type="14"
+                          data-referral-value="SVRQb3B1cFJFRw"
+                          style="
+                            display: inline-block;
+                            padding: 8px 15px;
+                            border: 1px solid #c0392b;
+                            color: #c0392b;
+                            text-decoration: none;
+                            position: relative;
+                            transition: color 0.3s ease;
+                          "
+                          onmouseover="this.style.color='white'; this.querySelector('span').style.height='100%';"
+                          onmouseout="this.style.color='#c0392b'; this.querySelector('span').style.height='0%';"
+                        >
+                          キャンペーンに参加
+                          <span
+                            style="
+                              position: absolute;
+                              bottom: 0;
+                              left: 0;
+                              width: 100%;
+                              height: 0;
+                              background-color: #c0392b;
+                              z-index: -1;
+                              transition: height 0.3s ease;
+                            "
+                          ></span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Malay (my) - Gradient Text -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Malay (my) - Gradient Text
+                    </div>
+                    <div class="language-content">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="my"
+                        data-referral-type="14"
+                        data-referral-value="YOUR_CAMPAIGN_ID"
+                        style="background: linear-gradient(90deg, #e67e22,
+                        #d35400); -webkit-background-clip: text;
+                        background-clip: text; color: transparent; font-weight:
+                        bold; text-decoration: none; font-size: 1.1em;
+                        letter-spacing: 0.5px;"&gt; Sertai Kempen &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="my"
+                          data-referral-type="14"
+                          data-referral-value="SVRQb3B1cFJFRw"
+                          style="
+                            background: linear-gradient(
+                              90deg,
+                              #e67e22,
+                              #d35400
+                            );
+                            -webkit-background-clip: text;
+                            background-clip: text;
+                            color: transparent;
+                            font-weight: bold;
+                            text-decoration: none;
+                            font-size: 1.1em;
+                            letter-spacing: 0.5px;
+                          "
+                        >
+                          Sertai Kempen
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Arabic (ar) - RTL Slide Effect -->
+                  <div class="language-card">
+                    <div class="language-header">
+                      Arabic (ar) - RTL Slide Effect
+                    </div>
+                    <div class="language-content rtl-example">
+                      <div class="example-code">
+                        &lt;a href="#" data-oqtima-trigger data-lang="ar"
+                        data-referral-type="14"
+                        data-referral-value="YOUR_CAMPAIGN_ID" style="display:
+                        inline-block; padding: 8px 15px; color: #34495e;
+                        text-decoration: none; font-weight: bold; position:
+                        relative; overflow: hidden; direction: rtl;"
+                        onmouseover="this.querySelector('span').style.right='0';"
+                        onmouseout="this.querySelector('span').style.right='-100%';"&gt;
+                        انضم للحملة &lt;span style="position: absolute; top: 0;
+                        right: -100%; width: 100%; height: 100%;
+                        background-color: rgba(52, 73, 94, 0.1); transition:
+                        right 0.3s ease;"&gt;&lt;/span&gt; &lt;/a&gt;
+                      </div>
+                      <div class="example-preview">
+                        <a
+                          href="#"
+                          data-oqtima-trigger
+                          data-lang="ar"
+                          data-referral-type="14"
+                          data-referral-value="SVRQb3B1cFJFRw"
+                          style="
+                            display: inline-block;
+                            padding: 8px 15px;
+                            color: #34495e;
+                            text-decoration: none;
+                            font-weight: bold;
+                            position: relative;
+                            overflow: hidden;
+                            direction: rtl;
+                          "
+                          onmouseover="this.querySelector('span').style.right='0';"
+                          onmouseout="this.querySelector('span').style.right='-100%';"
+                        >
+                          انضم للحملة
+                          <span
+                            style="
+                              position: absolute;
+                              top: 0;
+                              right: -100%;
+                              width: 100%;
+                              height: 100%;
+                              background-color: rgba(52, 73, 94, 0.1);
+                              transition: right 0.3s ease;
+                            "
+                          ></span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript for tab switching -->
+    <script>
+      function openTab(evt, tabName) {
+        // Hide all tab content
+        var tabcontent = document.getElementsByClassName("tab-content");
+        for (var i = 0; i < tabcontent.length; i++) {
+          // Only hide direct children of tab-container (not nested ones)
+          if (
+            tabcontent[i].parentElement.classList.contains("tab-container") &&
+            !tabcontent[i].parentElement.classList.contains(
+              "comprehensive-examples"
+            )
+          ) {
+            tabcontent[i].classList.remove("active");
+          }
+        }
+
+        // Remove "active" class from all main tab buttons
+        var tablinks = document
+          .querySelector(".tab-container > .tab-nav")
+          .querySelectorAll(".tab-button");
+        for (var i = 0; i < tablinks.length; i++) {
+          tablinks[i].classList.remove("active");
+        }
+
+        // Show the current tab and add "active" class to the button that opened the tab
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+
+        // Make sure the first subtab in this tab is active
+        var activeTab = document.getElementById(tabName);
+        var subtabContainer = activeTab.querySelector(
+          ".comprehensive-examples"
+        );
+        if (subtabContainer) {
+          var firstSubtabButton = subtabContainer.querySelector(
+            ".tab-nav .tab-button"
+          );
+          var firstSubtabContent =
+            subtabContainer.querySelector(".tab-content");
+
+          if (firstSubtabButton && firstSubtabContent) {
+            // Activate the first subtab button and content
+            var subtabButtons = subtabContainer.querySelectorAll(
+              ".tab-nav .tab-button"
+            );
+            var subtabContents =
+              subtabContainer.querySelectorAll(".tab-content");
+
+            // Remove active class from all
+            for (var i = 0; i < subtabButtons.length; i++) {
+              subtabButtons[i].classList.remove("active");
+            }
+            for (var i = 0; i < subtabContents.length; i++) {
+              subtabContents[i].classList.remove("active");
+            }
+
+            // Add active class to first ones
+            firstSubtabButton.classList.add("active");
+            firstSubtabContent.classList.add("active");
+          }
+        }
+      }
+
+      function openSubTab(evt, subTabName) {
+        // Find the current parent tab container
+        var parentTabContainer = evt.currentTarget.closest(
+          ".comprehensive-examples"
+        );
+
+        // Hide all subtab content within this container only
+        var subtabcontent = parentTabContainer.querySelectorAll(".tab-content");
+        for (var i = 0; i < subtabcontent.length; i++) {
+          subtabcontent[i].classList.remove("active");
+        }
+
+        // Remove "active" class from all subtab buttons within this container only
+        var subtablinks = parentTabContainer.querySelectorAll(".tab-button");
+        for (var i = 0; i < subtablinks.length; i++) {
+          subtablinks[i].classList.remove("active");
+        }
+
+        // Show the current subtab and add "active" class to the button that opened the subtab
+        document.getElementById(subTabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+      }
+
+      // Initialize tabs on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        // Make sure the first main tab is active
+        var firstTabButton = document.querySelector(
+          ".tab-container > .tab-nav .tab-button"
+        );
+        var firstTabContent = document.querySelector(
+          ".tab-container > .tab-content"
+        );
+
+        if (firstTabButton && firstTabContent) {
+          firstTabButton.classList.add("active");
+          firstTabContent.classList.add("active");
+
+          // Find all comprehensive example containers and activate first subtab in each
+          var subtabContainers = document.querySelectorAll(
+            ".comprehensive-examples"
+          );
+          subtabContainers.forEach(function (container) {
+            var firstSubtabButton = container.querySelector(
+              ".tab-nav .tab-button"
+            );
+            var firstSubtabContent = container.querySelector(".tab-content");
+
+            if (firstSubtabButton && firstSubtabContent) {
+              firstSubtabButton.classList.add("active");
+              firstSubtabContent.classList.add("active");
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
